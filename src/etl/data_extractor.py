@@ -15,10 +15,12 @@ class DataExtractor():
             .load(PRODUCTS_PATH)
         )
 
-        print(CUSTOMERS_PATH)
-
         customers_df = (
-            self.spark.read.format("com.crealytics.spark.excel").option("header", "true").option("sheetName", "Worksheet").option("inferSchema", "true").load(CUSTOMERS_PATH)
+            self.spark.read.format("com.crealytics.spark.excel")
+            .option("header", "true")
+            .option("sheetName", "Worksheet")
+            .option("inferSchema", "true")
+            .load(CUSTOMERS_PATH)
         )
 
         display(customers_df)

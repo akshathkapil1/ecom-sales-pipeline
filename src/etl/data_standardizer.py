@@ -1,5 +1,5 @@
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import col, trim, lower, to_date, when
+from pyspark.sql.functions import col, trim, lower, to_date, when, coalesce, regexp_replace
 from typing import Dict
 from .constants import *
 
@@ -31,7 +31,8 @@ class DataStandardizer:
     def _clean_customers(self, df: DataFrame) -> DataFrame:
         return (
             df.withColumn("customer_id", trim(col("customer_id")))
-              .withColumn("customer_name", trim(col("customer_name")))
+              .withColumn("customer_name",regexp_replace(trim(col("customer_name")), r"[^a-zA-Z\s]", ""))
+              .withColumn("customer_name", regexp_replace(col("customer_name"), "\\s+", " "))
               .withColumn("email", lower(trim(col("email"))))
               .withColumn("phone", trim(col("phone")))
               .withColumn("address", trim(col("address")))
@@ -39,7 +40,7 @@ class DataStandardizer:
               .withColumn("country", trim(col("country")))
               .withColumn("city", trim(col("city")))
               .withColumn("state", trim(col("state")))
-              .withColumn("postal_code", trim(col("postal_code")))
+              .withColumn("postal_code", when(col("postal_code").cast("int").isNotNull(), col("postal_code").cast("int")).otherwise(None))
               .withColumn("region", trim(col("region")))
               .na.drop(subset=["customer_id", "customer_name"])
         )
@@ -50,13 +51,21 @@ class DataStandardizer:
               .withColumn("discount", 
                           when((col("discount") >= 0) & (col("discount") <= 1), col("discount"))
                           .otherwise(0.0))
-              .withColumn("order_date", to_date(col("order_date"), "yyyy-MM-dd"))
+              .withColumn("order_date", coalesce(
+                  to_date(col("order_date"), "d/M/yyyy"), 
+                  to_date(col("order_date"), "dd/M/yyyy"),
+                  to_date(col("order_date"), "d/MM/yyyy"),
+                  to_date(col("order_date"), "dd/MM/yyyy")))
               .withColumn("order_id", trim(col("order_id")))
               .withColumn("price", when(col("price").isNotNull(), col("price").cast("double")).otherwise(0.0))
               .withColumn("product_id", trim(col("product_id")))
               .withColumn("profit", when(col("profit").isNotNull(), col("profit").cast("double")).otherwise(0.0))
               .withColumn("quantity", when(col("quantity").isNotNull(), col("quantity").cast("int")).otherwise(0))
-              .withColumn("ship_date", to_date(col("ship_date"), "yyyy-MM-dd"))
+              .withColumn("ship_date", coalesce(
+                  to_date(col("order_date"), "d/M/yyyy"), 
+                  to_date(col("order_date"), "dd/M/yyyy"),
+                  to_date(col("order_date"), "d/MM/yyyy"),
+                  to_date(col("order_date"), "dd/MM/yyyy")))
               .withColumn("ship_mode", trim(col("ship_mode")))
               .na.drop(subset=["customer_id", "order_id", "product_id"])
         )
