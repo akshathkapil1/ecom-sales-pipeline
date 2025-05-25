@@ -13,8 +13,6 @@ class DataTransformer:
         self.products_df = silver_tables[PRODUCTS_KEY]
 
     def _create_enriched_orders(self) -> DataFrame:
-        self.orders_df.printSchema()
-
         return (
             self.orders_df
             .join(self.customers_df, on="customer_id", how="inner")

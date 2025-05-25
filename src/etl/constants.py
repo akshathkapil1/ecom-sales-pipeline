@@ -11,4 +11,3 @@ ORDERS_KEY = "orders"
 # Transformer
 ENRICHED_ORDERS_KEY = "enriched_orders"
 AGGREGATED_PROFIT_KEY = "aggregated_profit"
-
