@@ -1,6 +1,6 @@
 from pyspark.sql import SparkSession, DataFrame
 from typing import Dict
-from constants import *
+from .constants import *
 
 class DataExtractor():
     def __init__(self, spark: SparkSession):
@@ -15,12 +15,13 @@ class DataExtractor():
             .load(PRODUCTS_PATH)
         )
 
+        print(CUSTOMERS_PATH)
+
         customers_df = (
-            self.spark.read.format("csv")
-            .option("inferSchema", "true")
-            .option("header", "true")
-            .load(CUSTOMERS_PATH)
+            self.spark.read.format("com.crealytics.spark.excel").option("header", "true").option("sheetName", "Worksheet").option("inferSchema", "true").load(CUSTOMERS_PATH)
         )
+
+        display(customers_df)
 
         orders_df = (
             self.spark.read.format("json")

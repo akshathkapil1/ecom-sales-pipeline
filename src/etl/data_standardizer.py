@@ -1,7 +1,7 @@
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, trim, lower, to_date, when
 from typing import Dict
-from constants import *
+from .constants import *
 
 class DataStandardizer:
 
