@@ -54,7 +54,7 @@ def test_data_transformer_process(sample_dataframes):
 
     enriched_rows = enriched_df.collect()
     assert len(enriched_rows) == 2
-    assert enriched_rows[0]["rounded_profit"] == round(sample_dataframes[ORDERS_KEY].collect()[0]["profit"], 2)
+    assert enriched_rows[0]["rounded_profit"] == round(sample_dataframes[ORDERS_KEY].collect()[0]["profit"], 2) # profit rounded to 2 decimal places
 
     # Assert aggregated profit calculation
     aggregated_rows = aggregated_df.collect()
